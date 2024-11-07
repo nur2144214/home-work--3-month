@@ -1,17 +1,13 @@
-from decouple import config
-from aiogram import Dispatcher, Bot, executor, types
+from config import bot, dp
+from aiogram import executor, types
 import logging
-
-token = config("TOKEN")
-bot = Bot(token=token)
-dp = Dispatcher(bot)
+from handlers import commands, quiz
 
 
-@dp.message_handler(commands=["start"])
-async def start(message: types.Message):
-    await bot.send_message(chat_id=message.from_user.id, text=f'{message.from_user.first_name}\n'
-                                                              f'твой telegram id - {message.from_user.id}')
-    await message.answer("привет")
-if __name__ == "__main__":
-   logging.basicConfig(level=logging.INFO)
-   executor.start_polling(dp, skip_updates=True)
+commands.register_commands(dp)
+quiz.register_handler_quiz(dp)
+
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
+    executor.start_polling(dp, skip_updates=True, allowed_updates=['callback'])
